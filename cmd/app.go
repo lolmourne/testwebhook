@@ -51,8 +51,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	defer r.Body.Close()
-	log.Println(sendBird.AppID)
-	log.Println(request)
+	log.Println(fmt.Sprintf("APPID: %v CATEGORY: %v TYPE: %v", sendBird.AppID, sendBird.Category, sendBird.Type))
 
 }
 
