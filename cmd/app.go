@@ -1,10 +1,11 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
-
-	"encoding/json"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -15,7 +16,7 @@ func main() {
 
 	mux := newRouter()
 
-	http.ListenAndServe(":8080", mux)
+	http.ListenAndServe(":8756", mux)
 }
 
 func newRouter() *mux.Router {
@@ -26,6 +27,19 @@ func newRouter() *mux.Router {
 }
 
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
+
+	var request []string
+	url := fmt.Sprintf("%v %v %v", r.Method, r.URL, r.Proto)
+	request = append(request, url)
+	request = append(request, fmt.Sprintf("Host: %v", r.Host))
+
+	// Loop through headers
+	for name, headers := range r.Header {
+		name = strings.ToLower(name)
+		for _, h := range headers {
+			request = append(request, fmt.Sprintf("%v: %v", name, h))
+		}
+	}
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -38,6 +52,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 	log.Println(sendBird.AppID)
+	log.Println(request)
 
 }
 
